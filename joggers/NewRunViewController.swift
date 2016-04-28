@@ -119,6 +119,8 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
     private var isRunning = false{
         didSet{
             if isRunning{
+                
+                //不知名的原因，反正开启定位的时候这么做就可以避免很多莫名其妙的bug
                 locationManager.startMonitoringSignificantLocationChanges()
                 locationManager.startUpdatingLocation()
                 locationManager.startUpdatingHeading()
