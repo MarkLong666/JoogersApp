@@ -79,13 +79,13 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
     //用来展示跑步的距离，时间，速度，步数的四个Label
     //Distance
     @IBOutlet weak var distanceLabel: UILabel!
-    private var previousLocation: CLLocation?
+    private var previousLocation: CLLocation? = nil
     private var distance = 0.0{
         didSet{
-            if distance != 0{
-                distanceLabel.text = "\(Int(distance))m"
-            }else{
+            if distance == 0.0{
                 distanceLabel.text = "0.00M"
+            }else{
+                distanceLabel.text = "\(Int(distance))m"
             }
         }
     }
@@ -117,11 +117,27 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
     
     //指示跑步是否已经开始
     private var isRunning = false{
-        willSet{
-            if newValue == true{
+        didSet{
+            if isRunning{
+                locationManager.startMonitoringSignificantLocationChanges()
                 locationManager.startUpdatingLocation()
                 locationManager.startUpdatingHeading()
-            }else{
+                
+                delay(seconds: 1, completion: {
+                    self.locationManager.stopMonitoringSignificantLocationChanges()
+                    self.locationManager.stopUpdatingHeading()
+                    self.locationManager.stopUpdatingLocation()
+                })
+                
+                delay(seconds: 1, completion: {
+                    self.locationManager.startMonitoringSignificantLocationChanges()
+                    self.locationManager.startUpdatingLocation()
+                    self.locationManager.startUpdatingHeading()
+                })
+                
+
+                
+                }else{
                 locationManager.stopMonitoringSignificantLocationChanges()
                 locationManager.stopUpdatingHeading()
                 locationManager.stopUpdatingLocation()
@@ -197,6 +213,8 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
         locationManager.activityType = .Fitness
         locationManager.distanceFilter = 10.0
         
+        locationManager.requestAlwaysAuthorization()
+       
         return locationManager
     }()
     
@@ -204,6 +222,9 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
     //底部四个按钮触发的事件
     //开始按钮
     @IBAction func startPressed() {
+
+        mapView.showsUserLocation = true
+        mapView.userTrackingMode = .FollowWithHeading
 
         isInARunningLoop = true
         stepCounter.startStepCounting()
@@ -359,11 +380,8 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
         }
         
         //设置地图的随时定位
-        locationManager.requestAlwaysAuthorization()
-        mapView.showsUserLocation = true
-        mapView.userTrackingMode = .FollowWithHeading
-        //locationManager.startUpdatingLocation()
-        locationManager.startUpdatingHeading()
+                //locationManager.startUpdatingLocation()
+        //locationManager.startUpdatingHeading()
         
         //当前设备如果是iphone4s及以下设备时改变视图布局
         if UIScreen.mainScreen().bounds.size.height == 480.0{
@@ -450,26 +468,31 @@ extension NewRunViewController: CLLocationManagerDelegate{
     
     func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
-        for location in locations{
-            
-            if location.horizontalAccuracy < 20{
+        dispatch_async(dispatch_get_main_queue()) {
+            for location in locations{
                 
-                if self.previousLocation != nil{
-                    distance += location.distanceFromLocation(previousLocation!)
-                    workout.distance = Int(distance)
-                    //每更新一次距离更新一次跑步速度
-                    if isRunning{
-                        let runningTime = timeCounter.getCurrentRunningTime()
-                        if runningTime != 0{
-                            let pace = Int(distance)/runningTime
-                            workout.pace = pace
-                            self.paceLabel.text = "\(pace)"
+                if location.horizontalAccuracy < 20{
+                    if self.previousLocation == nil {
+                        self.distance = 0
+                    }
+                    if self.previousLocation != nil{
+                        self.distance += location.distanceFromLocation(self.previousLocation!)
+                        self.workout.distance = Int(self.distance)
+                        //每更新一次距离更新一次跑步速度
+                        if self.isRunning{
+                            let runningTime = self.timeCounter.getCurrentRunningTime()
+                            if runningTime != 0{
+                                let pace = Int(self.distance)/runningTime
+                                self.workout.pace = pace
+                                self.paceLabel.text = "\(pace)"
+                            }
                         }
                     }
+                    
+                    self.previousLocation = location
                 }
-                
-                previousLocation = location
             }
+
         }
     }
 }
