@@ -121,24 +121,12 @@
 		9F6A807F1C97B3DB00E90FA8 /* joggers */ = {
 			isa = PBXGroup;
 			children = (
-				9F6A80801C97B3DB00E90FA8 /* AppDelegate.swift */,
-				9F6A80A21C97E9A700E90FA8 /* ToolBox */,
-				9F6A80991C97B89B00E90FA8 /* SWRevealViewController */,
-				9F02008F1C9931C2004CE728 /* MenuTableViewController.swift */,
-				9F6A809A1C97BA2C00E90FA8 /* NewRunViewController.swift */,
-				9F39A2151C99796C0091E22B /* SaveAndShareViewController.swift */,
-				9F092BE21CC6100900B488A0 /* HudView.swift */,
-				9F092BDD1CC47AC100B488A0 /* photoCaptureControllers */,
-				9F28D3F61C9ACAEE005ACA75 /* HistoryTableViewController */,
-				9F28D3FF1C9BEF58005ACA75 /* CarouselShowHistoryController */,
+				9F6A80A21C97E9A700E90FA8 /* Counting model */,
+				9F845D441CE0318000FD9D99 /* Persistence model */,
 				9F6A80841C97B3DB00E90FA8 /* Main.storyboard */,
-				9F6A808A1C97B3DB00E90FA8 /* Assets.xcassets */,
-				9F6A808C1C97B3DB00E90FA8 /* LaunchScreen.storyboard */,
-				9F6A808F1C97B3DB00E90FA8 /* Info.plist */,
-				9FF84F4B1CA40CE500E262B5 /* Jog.swift */,
-				9FF84F421CA40B9600E262B5 /* Workout.swift */,
-				9F5215741CBF3D14001C6F5E /* Workout+CoreDataProperties.swift */,
-				9F6A80871C97B3DB00E90FA8 /* joggers.xcdatamodeld */,
+				9FEFBD1F1CFB400500C58260 /* Controllers */,
+				9F28D3F21C9AC0AD005ACA75 /* FunctionUtil.swift */,
+				9FEFBD201CFB403D00C58260 /* Supporting Files */,
 			);
 			path = joggers;
 			sourceTree = "<group>";
@@ -153,14 +141,58 @@
 			name = SWRevealViewController;
 			sourceTree = "<group>";
 		};
-		9F6A80A21C97E9A700E90FA8 /* ToolBox */ = {
+		9F6A80A21C97E9A700E90FA8 /* Counting model */ = {
 			isa = PBXGroup;
 			children = (
 				9F6A80A31C98009300E90FA8 /* RunningTimer.swift */,
 				9FF84F351CA381CB00E262B5 /* StepCounter.swift */,
-				9F28D3F21C9AC0AD005ACA75 /* FunctionUtil.swift */,
 			);
-			name = ToolBox;
+			name = "Counting model";
+			sourceTree = "<group>";
+		};
+		9F845D441CE0318000FD9D99 /* Persistence model */ = {
+			isa = PBXGroup;
+			children = (
+				9FF84F4B1CA40CE500E262B5 /* Jog.swift */,
+				9FF84F421CA40B9600E262B5 /* Workout.swift */,
+				9F5215741CBF3D14001C6F5E /* Workout+CoreDataProperties.swift */,
+				9F6A80871C97B3DB00E90FA8 /* joggers.xcdatamodeld */,
+			);
+			name = "Persistence model";
+			sourceTree = "<group>";
+		};
+		9F845D451CE031E300FD9D99 /* SaveAndShareControllers */ = {
+			isa = PBXGroup;
+			children = (
+				9F39A2151C99796C0091E22B /* SaveAndShareViewController.swift */,
+				9F092BE21CC6100900B488A0 /* HudView.swift */,
+			);
+			name = SaveAndShareControllers;
+			sourceTree = "<group>";
+		};
+		9FEFBD1F1CFB400500C58260 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				9F6A80991C97B89B00E90FA8 /* SWRevealViewController */,
+				9F02008F1C9931C2004CE728 /* MenuTableViewController.swift */,
+				9F6A809A1C97BA2C00E90FA8 /* NewRunViewController.swift */,
+				9F845D451CE031E300FD9D99 /* SaveAndShareControllers */,
+				9F092BDD1CC47AC100B488A0 /* photoCaptureControllers */,
+				9F28D3F61C9ACAEE005ACA75 /* HistoryTableViewController */,
+				9F28D3FF1C9BEF58005ACA75 /* CarouselShowHistoryController */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		9FEFBD201CFB403D00C58260 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				9F6A80801C97B3DB00E90FA8 /* AppDelegate.swift */,
+				9F6A808A1C97B3DB00E90FA8 /* Assets.xcassets */,
+				9F6A808C1C97B3DB00E90FA8 /* LaunchScreen.storyboard */,
+				9F6A808F1C97B3DB00E90FA8 /* Info.plist */,
+			);
+			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

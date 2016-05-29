@@ -25,6 +25,7 @@ class HistoryTableViewCell: UITableViewCell {
         }
     }
     
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         separatorInset = UIEdgeInsets(top: 0, left: iconImageView.layer.bounds.width + 10, bottom: 0, right: 8)
