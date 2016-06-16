@@ -11,7 +11,7 @@ import UIKit
 class MenuTableViewController: UITableViewController {
 
     //用于配置Cell的图标和文字的属性
-    private var cellTitles = ["JOGGERS", "New run", "History"]
+    private var cellTitles = ["RUNNER", "New run", "History"]
     private var cellFontNames = ["AvenirNextCondensed-italic", "Futura-Medium", "Futura-Medium"]
     private var cellFontSize: [CGFloat] = [40, 22, 22]
     private var imageNames = ["nil", "running_man", "running_history"]
