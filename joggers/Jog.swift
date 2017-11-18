@@ -14,7 +14,7 @@ class Jog: NSObject {
     var steps:Int!
     var pace:Int!
     var time:Int!
-    var date:NSDate!
+    var date:Date!
     var image:UIImage?
     
     

@@ -9,17 +9,17 @@
 import Foundation
 
 //自定义的延迟时间以延迟执行某些指令的方法
-func delay(seconds seconds: Double, completion: ()->()){
+func delay(seconds: Double, completion: @escaping ()->()){
     
-    let popTime = dispatch_time(DISPATCH_TIME_NOW, Int64( Double(NSEC_PER_SEC) * seconds ) )
+    let popTime = DispatchTime.now() + Double(Int64( Double(NSEC_PER_SEC) * seconds )) / Double(NSEC_PER_SEC)
     
-    dispatch_after(popTime, dispatch_get_main_queue()){
+    DispatchQueue.main.asyncAfter(deadline: popTime){
         completion()
     }
 }
 
 //从以秒计时的时间里获得表示时间的字符串用于显示
-func getTimeStringFromSecond(seconds: Int) -> String {
+func getTimeStringFromSecond(_ seconds: Int) -> String {
     
     let secondNumber = seconds % 60
     let minuteNumber = (seconds / 60) % 60
@@ -48,18 +48,18 @@ struct PhotoCaptureNotification{
 
 //用于改变图片大小
 extension UIImage {
-    func resizedImageWithBounds(bounds: CGSize) -> UIImage {
+    func resizedImageWithBounds(_ bounds: CGSize) -> UIImage {
         let horizontalRatio = bounds.width / size.width
         let verticalRatio = bounds.height / size.height
         let ratio = min(horizontalRatio, verticalRatio)
         let newSize = CGSize(width: size.width * ratio, height: size.height * ratio)
         
         UIGraphicsBeginImageContextWithOptions(newSize, true, 0)
-        drawInRect(CGRect(origin: CGPoint.zero, size: newSize))
+        draw(in: CGRect(origin: CGPoint.zero, size: newSize))
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        return newImage
+        return newImage!
     }
 }
 

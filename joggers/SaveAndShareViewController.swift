@@ -26,18 +26,18 @@ class SaveAndShareViewController: UIViewController, UIImagePickerControllerDeleg
     @IBOutlet weak var distanceLabel: UILabel!
     @IBOutlet weak var steplabel: UILabel!
     
-    private var managedContext: NSManagedObjectContext!
-    private var screenShotImage: UIImage!
+    fileprivate var managedContext: NSManagedObjectContext!
+    fileprivate var screenShotImage: UIImage!
     
     @IBAction func SavePressed() {
-        saveButton.enabled = false
-        let entity = NSEntityDescription.entityForName("Workout", inManagedObjectContext: managedContext)
-        let workoutToSave = Workout(entity: entity!, insertIntoManagedObjectContext: managedContext)
+        saveButton.isEnabled = false
+        let entity = NSEntityDescription.entity(forEntityName: "Workout", in: managedContext)
+        let workoutToSave = Workout(entity: entity!, insertInto: managedContext)
         workoutToSave.date = workout.date
-        workoutToSave.distance = workout.distance
-        workoutToSave.pace = workout.pace
-        workoutToSave.steps = workout.steps
-        workoutToSave.time = workout.time
+        workoutToSave.distance = workout.distance as NSNumber?
+        workoutToSave.pace = workout.pace as NSNumber?
+        workoutToSave.steps = workout.steps as NSNumber?
+        workoutToSave.time = workout.time as NSNumber?
         if let image = workout.image {
             let imageData = UIImagePNGRepresentation(image)
             workoutToSave.photo = imageData
@@ -58,113 +58,113 @@ class SaveAndShareViewController: UIViewController, UIImagePickerControllerDeleg
     }
     
     
-    @IBAction func sharePressed(sender: UIBarButtonItem) {
+    @IBAction func sharePressed(_ sender: UIBarButtonItem) {
         getScreenShot()
-        let shareActionSheet = UIAlertController(title: "分享到", message: nil, preferredStyle: .ActionSheet)
-        shareActionSheet.addAction(UIAlertAction(title: "新浪微博", style: .Default, handler: { _ in self.sinaWeiboSharing()}))
-        shareActionSheet.addAction(UIAlertAction(title: "腾讯微博", style: .Default, handler: { _ in self.tecentWeiboSharing()}))
-        shareActionSheet.addAction(UIAlertAction(title: "facebook", style: .Default, handler: { _ in self.facebookSharing()}))
-        shareActionSheet.addAction(UIAlertAction(title: "twitter", style: .Default, handler: { _ in self.twitterSharing()}))
-        shareActionSheet.addAction(UIAlertAction(title: "取消", style: .Cancel, handler: nil))
-        presentViewController(shareActionSheet, animated: true, completion: nil)
+        let shareActionSheet = UIAlertController(title: "分享到", message: nil, preferredStyle: .actionSheet)
+        shareActionSheet.addAction(UIAlertAction(title: "新浪微博", style: .default, handler: { _ in self.sinaWeiboSharing()}))
+        shareActionSheet.addAction(UIAlertAction(title: "腾讯微博", style: .default, handler: { _ in self.tecentWeiboSharing()}))
+        shareActionSheet.addAction(UIAlertAction(title: "facebook", style: .default, handler: { _ in self.facebookSharing()}))
+        shareActionSheet.addAction(UIAlertAction(title: "twitter", style: .default, handler: { _ in self.twitterSharing()}))
+        shareActionSheet.addAction(UIAlertAction(title: "取消", style: .cancel, handler: nil))
+        present(shareActionSheet, animated: true, completion: nil)
 
     }
     
     func getScreenShot(){
         let layer = infoContainerView.layer
         //let layer = UIApplication.sharedApplication().keyWindow!.layer
-        let scale = UIScreen.mainScreen().scale
+        let scale = UIScreen.main.scale
         UIGraphicsBeginImageContextWithOptions(layer.frame.size, false, scale);
         
-        layer.renderInContext(UIGraphicsGetCurrentContext()!)
+        layer.render(in: UIGraphicsGetCurrentContext()!)
         screenShotImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
     }
 
     //MARK: - different kinds of sharing
     func sinaWeiboSharing(){
-        if SLComposeViewController.isAvailableForServiceType(SLServiceTypeSinaWeibo){
+        if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeSinaWeibo){
             let sinaWeboCompsor = SLComposeViewController(forServiceType: SLServiceTypeSinaWeibo)
-            sinaWeboCompsor.setInitialText("今天的锻炼目标，完成!")
-            sinaWeboCompsor.addImage(screenShotImage)
-            presentViewController(sinaWeboCompsor, animated: true, completion: nil)
+            sinaWeboCompsor?.setInitialText("今天的锻炼目标，完成!")
+            sinaWeboCompsor?.add(screenShotImage)
+            present(sinaWeboCompsor!, animated: true, completion: nil)
         }
         
     }
     
     func tecentWeiboSharing(){
-        if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTencentWeibo){
+        if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeTencentWeibo){
             let tecentWeboCompor = SLComposeViewController(forServiceType: SLServiceTypeTencentWeibo)
-            tecentWeboCompor.setInitialText("今天的锻炼目标，完成!")
-            tecentWeboCompor.addImage(screenShotImage)
-            presentViewController(tecentWeboCompor, animated: true, completion: nil)
+            tecentWeboCompor?.setInitialText("今天的锻炼目标，完成!")
+            tecentWeboCompor?.add(screenShotImage)
+            present(tecentWeboCompor!, animated: true, completion: nil)
         }
     }
     
     func facebookSharing(){
-        if SLComposeViewController.isAvailableForServiceType(SLServiceTypeFacebook){
+        if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeFacebook){
             let facebookCompor = SLComposeViewController(forServiceType: SLServiceTypeFacebook)
-            facebookCompor.setInitialText("今天的锻炼目标，完成!")
-            facebookCompor.addImage(screenShotImage)
-            presentViewController(facebookCompor, animated: true, completion: nil)
+            facebookCompor?.setInitialText("今天的锻炼目标，完成!")
+            facebookCompor?.add(screenShotImage)
+            present(facebookCompor!, animated: true, completion: nil)
         }
     }
     
     func twitterSharing(){
-        if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter){
+        if SLComposeViewController.isAvailable(forServiceType: SLServiceTypeTwitter){
             let twitterCompor = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
-            twitterCompor.setInitialText("今天的锻炼目标，完成!")
-            twitterCompor.addImage(screenShotImage)
-            presentViewController(twitterCompor, animated: true, completion: nil)
+            twitterCompor?.setInitialText("今天的锻炼目标，完成!")
+            twitterCompor?.add(screenShotImage)
+            present(twitterCompor!, animated: true, completion: nil)
         }
     }
 
     
     @IBAction func photoButtonPressed() {
-        let alertController = UIAlertController(title: "Pick a photo", message: "Pick a photo from library or take a new photo", preferredStyle: .ActionSheet)
+        let alertController = UIAlertController(title: "Pick a photo", message: "Pick a photo from library or take a new photo", preferredStyle: .actionSheet)
         
-        alertController.addAction(UIAlertAction(title: "from library", style: .Default, handler: { _ in
+        alertController.addAction(UIAlertAction(title: "from library", style: .default, handler: { _ in
             self.choosePhotoFromLibrary()
         }))
-        alertController.addAction(UIAlertAction(title: "new photo", style: .Default, handler: { _ in
-            self.performSegueWithIdentifier(TakePhotoSegueIdentifier, sender: nil)
+        alertController.addAction(UIAlertAction(title: "new photo", style: .default, handler: { _ in
+            self.performSegue(withIdentifier: TakePhotoSegueIdentifier, sender: nil)
         }))
         
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
-        presentViewController(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
         
     }
     
     func choosePhotoFromLibrary(){
         let imagePicker = UIImagePickerController()
-        imagePicker.sourceType = .PhotoLibrary
+        imagePicker.sourceType = .photoLibrary
         imagePicker.delegate = self
         imagePicker.allowsEditing = true
         imagePicker.view.tintColor = view.tintColor
-        presentViewController(imagePicker, animated: true
+        present(imagePicker, animated: true
             , completion: nil)
         
     }
     
-    func imagePickerControllerDidCancel(picker: UIImagePickerController) {
-        dismissViewControllerAnimated(true, completion: nil)
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
     }
     
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         if let image = info[UIImagePickerControllerEditedImage] as? UIImage{
             workout.image = image
             let iconImage = image.resizedImageWithBounds(cameraButton.layer.bounds.size)
-            cameraButton.setImage(iconImage, forState: .Normal)
+            cameraButton.setImage(iconImage, for: UIControlState())
         }
         
-        dismissViewControllerAnimated(true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
     
     var workout: Jog = Jog(){
         didSet{
-            workout.date = NSDate()
+            workout.date = Date()
         }
     }
     override func viewDidLoad() {
@@ -180,71 +180,71 @@ class SaveAndShareViewController: UIViewController, UIImagePickerControllerDeleg
         cameraButton.clipsToBounds = true
         
         //当设备是iphone4s及以下设备时修复视图布局
-        if UIScreen.mainScreen().bounds.size.height == 480.0{
+        if UIScreen.main.bounds.size.height == 480.0{
             
             for constraint in infoTitleLabel.superview!.constraints{
                 
-                if constraint.firstItem as? NSObject == infoTitleLabel && constraint.firstAttribute == .Top{
+                if constraint.firstItem as? NSObject == infoTitleLabel && constraint.firstAttribute == .top{
                     constraint.constant -= 10
                 }
             }
             for constraint in cameraButton.superview!.constraints{
                 
-                if constraint.firstItem as? NSObject == cameraButton && constraint.firstAttribute == .Top{
+                if constraint.firstItem as? NSObject == cameraButton && constraint.firstAttribute == .top{
                     constraint.constant -= 10
                 }
             }
             
             for constraint in timeLabel.superview!.constraints{
-                if constraint.firstItem as? NSObject == timeLabel && constraint.firstAttribute == .Top{
+                if constraint.firstItem as? NSObject == timeLabel && constraint.firstAttribute == .top{
                     constraint.constant -= 15
                 }
             }
         }
         
-        let appdelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        let appdelegate = UIApplication.shared.delegate as! AppDelegate
         managedContext = appdelegate.managedObjectContext
         
-        NSNotificationCenter.defaultCenter().addObserverForName(PhotoCaptureNotification.photoInfoNotificationName, object: nil, queue: NSOperationQueue.mainQueue()) { (notification) in
-            let image = notification.userInfo!["photo"] as! UIImage
+        NotificationCenter.default.addObserver(forName: NSNotification.Name(rawValue: PhotoCaptureNotification.photoInfoNotificationName), object: nil, queue: OperationQueue.main) { (notification) in
+            let image = (notification as NSNotification).userInfo!["photo"] as! UIImage
             self.workout.image = image
             let iconImage = image.resizedImageWithBounds(self.cameraButton.layer.bounds.size)
-            self.cameraButton.setImage(iconImage, forState: .Normal)
+            self.cameraButton.setImage(iconImage, for: UIControlState())
         }
 
     }
 
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         //将用于动画的控件的自动布局参数改变使的它们移出界面以准备动画
         for constraint in infoTitleLabel.superview!.constraints{
             
-            if constraint.firstItem as? NSObject == infoTitleLabel && constraint.firstAttribute == .Top{
+            if constraint.firstItem as? NSObject == infoTitleLabel && constraint.firstAttribute == .top{
                 constraint.constant -= view.bounds.height/2
             }
         }
         for constraint in distanceAndStepSatckView.superview!.constraints{
             
-            if constraint.firstItem as? NSObject == distanceAndStepSatckView && constraint.firstAttribute == .CenterX{
+            if constraint.firstItem as? NSObject == distanceAndStepSatckView && constraint.firstAttribute == .centerX{
                 constraint.constant -= view.bounds.width
             }
         }
         for constraint in timeLabel.superview!.constraints{
             
-            if constraint.firstItem as? NSObject == timeLabel && constraint.firstAttribute == .CenterX{
+            if constraint.firstItem as? NSObject == timeLabel && constraint.firstAttribute == .centerX{
                 constraint.constant += view.bounds.width
             }
         }
         for constraint in discriptionLabel.superview!.constraints{
             
-            if constraint.secondItem as? NSObject == discriptionLabel && constraint.firstAttribute == .Bottom{
+            if constraint.secondItem as? NSObject == discriptionLabel && constraint.firstAttribute == .bottom{
                 constraint.constant -= view.bounds.height
             }
         }
         for constraint in infoContainerView.superview!.constraints{
             
-            if constraint.firstItem as? NSObject == infoContainerView && constraint.firstAttribute == .Height{
+            if constraint.firstItem as? NSObject == infoContainerView && constraint.firstAttribute == .height{
                 constraint.constant -= view.bounds.height * constraint.multiplier
             }
         }
@@ -253,47 +253,47 @@ class SaveAndShareViewController: UIViewController, UIImagePickerControllerDeleg
         cameraButton.alpha = 0.0
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         //将被用于动画的界面元素的自动布局参数设回原值
         for constraint in infoTitleLabel.superview!.constraints{
             
-            if constraint.firstItem as? NSObject == infoTitleLabel && constraint.firstAttribute == .Top{
+            if constraint.firstItem as? NSObject == infoTitleLabel && constraint.firstAttribute == .top{
                 constraint.constant += view.bounds.height/2
             }
         }
         for constraint in distanceAndStepSatckView.superview!.constraints{
             
-            if constraint.firstItem as? NSObject == distanceAndStepSatckView && constraint.firstAttribute == .CenterX{
+            if constraint.firstItem as? NSObject == distanceAndStepSatckView && constraint.firstAttribute == .centerX{
                 constraint.constant += view.bounds.width
             }
         }
         for constraint in timeLabel.superview!.constraints{
             
-            if constraint.firstItem as? NSObject == timeLabel && constraint.firstAttribute == .CenterX{
+            if constraint.firstItem as? NSObject == timeLabel && constraint.firstAttribute == .centerX{
                 constraint.constant -= view.bounds.width
             }
         }
         for constraint in discriptionLabel.superview!.constraints{
             
-            if constraint.secondItem as? NSObject == discriptionLabel && constraint.firstAttribute == .Bottom{
+            if constraint.secondItem as? NSObject == discriptionLabel && constraint.firstAttribute == .bottom{
                 constraint.constant += view.bounds.height
             }
         }
         for constraint in infoContainerView.superview!.constraints{
             
-            if constraint.firstItem as? NSObject == infoContainerView && constraint.firstAttribute == .Height{
+            if constraint.firstItem as? NSObject == infoContainerView && constraint.firstAttribute == .height{
                 constraint.constant += view.bounds.height * constraint.multiplier
             }
         }
 
         //将控件移动回原处的动画
-        UIView.animateWithDuration(0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 15, options: .CurveEaseInOut, animations: {
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 15, options: UIViewAnimationOptions(), animations: {
             self.view.layoutIfNeeded()
             }, completion: nil)
         //将照相机图标显示出来的动画
-        UIView.animateWithDuration(1.0, delay: 0.3, options: [], animations: {
+        UIView.animate(withDuration: 1.0, delay: 0.3, options: [], animations: {
             self.cameraButton.alpha = 1.0
             }, completion: nil)
         

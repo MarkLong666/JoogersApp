@@ -30,16 +30,16 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
     @IBOutlet weak var playOrPauseMusicButton: UIButton!
     
     //用来指示按键是否可以为一次运动而开始工作
-    private var isInARunningLoop = false{
+    fileprivate var isInARunningLoop = false{
         didSet{
             if !isInARunningLoop {
-                pauseOrContinueButton.setImage(UIImage(named: "tapToPauseIcon"), forState: .Normal)
+                pauseOrContinueButton.setImage(UIImage(named: "tapToPauseIcon"), for: UIControlState())
             }
         }
     }
     
     //用来记录一次运动对象
-    lazy private var workout: Jog = {
+    lazy fileprivate var workout: Jog = {
         let jog = Jog()
         jog.distance = 0
         jog.pace = 0
@@ -49,38 +49,38 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
     }()
     
     //用于播放音乐的属性
-    private lazy var myMusicPlayer = MPMusicPlayerController()
-    private var musicIsPlaying = false{
+    fileprivate lazy var myMusicPlayer = MPMusicPlayerController()
+    fileprivate var musicIsPlaying = false{
         didSet{
             if musicIsPlaying {
-                playOrPauseMusicButton.setTitle("Pause", forState: .Normal)
+                playOrPauseMusicButton.setTitle("Pause", for: UIControlState())
             }else{
-                playOrPauseMusicButton.setTitle("Play", forState: .Normal)
+                playOrPauseMusicButton.setTitle("Play", for: UIControlState())
             }
         }
     }
     
-    @IBAction func playMusic(sender: UIBarButtonItem) {
-        if playMusicContainerView.hidden {
-            playMusicContainerView.hidden = false
+    @IBAction func playMusic(_ sender: UIBarButtonItem) {
+        if playMusicContainerView.isHidden {
+            playMusicContainerView.isHidden = false
             playMusicContainerView.alpha = 0
             let originalWidth = playMusicContainerView.bounds.width
             playMusicContainerView.layer.frame.size.width = 0
-            UIView.animateWithDuration(0.2, animations: {
+            UIView.animate(withDuration: 0.2, animations: {
                 self.playMusicContainerView.alpha = 1
                 self.playMusicContainerView.layer.frame.size.width = originalWidth
             })
             
         }else{
-                self.playMusicContainerView.hidden = true
+                self.playMusicContainerView.isHidden = true
         }
     }
     
     //用来展示跑步的距离，时间，速度，步数的四个Label
     //Distance
     @IBOutlet weak var distanceLabel: UILabel!
-    private var previousLocation: CLLocation? = nil
-    private var distance = 0.0{
+    fileprivate var previousLocation: CLLocation? = nil
+    fileprivate var distance = 0.0{
         didSet{
             if distance == 0.0{
                 distanceLabel.text = "0.00M"
@@ -92,7 +92,7 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
 
     //Time
     @IBOutlet weak var timeLabel: UILabel!
-    lazy private var timeCounter: RunningTimer = {
+    lazy fileprivate var timeCounter: RunningTimer = {
         [unowned self] in
         return RunningTimer(timeLabel: self.timeLabel)
     }()
@@ -102,21 +102,21 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
     
     //Step
     @IBOutlet weak var stepLabel: UILabel!
-    lazy private var stepCounter: StepCounter = {
+    lazy fileprivate var stepCounter: StepCounter = {
         let counter = StepCounter()
         counter.delegate = self
         return counter
     }()
     
     //StepCountingDelegate
-    func didUpdateSteps(numberOfSteps: Int) {
+    func didUpdateSteps(_ numberOfSteps: Int) {
         workout.steps = numberOfSteps
         stepLabel.text = "\(numberOfSteps)"
         
     }
     
     //指示跑步是否已经开始
-    private var isRunning = false{
+    fileprivate var isRunning = false{
         didSet{
             if isRunning{
                 
@@ -147,15 +147,15 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
         }
     }
     //长按使地图进入全屏幕或者半屏
-    lazy private var isFullScreenMapOpen = false
-    @IBAction func tapMapView(sender: UITapGestureRecognizer) {
+    lazy fileprivate var isFullScreenMapOpen = false
+    @IBAction func tapMapView(_ sender: UITapGestureRecognizer) {
         
         if !isFullScreenMapOpen{
             
             //当地图并不是在大屏状态时调整其自动布局参数使其进入大屏
             for constraint in mapView.superview!.constraints{
                 
-                if constraint.firstItem as! NSObject == mapView && constraint.firstAttribute == .Height{
+                if constraint.firstItem as! NSObject == mapView && constraint.firstAttribute == .height{
                     
                     constraint.constant += ruleView.bounds.height
                     
@@ -163,40 +163,40 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
             }
             for constraint in mapView.superview!.constraints{
                 
-                if constraint.secondItem as? NSObject == pauseOrContinueButton && constraint.firstAttribute == .Top{
+                if constraint.secondItem as? NSObject == pauseOrContinueButton && constraint.firstAttribute == .top{
                     
                     constraint.constant -= self.view.bounds.height/4
                 }
             }
             
-            startButton.hidden = true
-            pauseOrContinueButton.hidden = true
-            endButton.hidden = true
+            startButton.isHidden = true
+            pauseOrContinueButton.isHidden = true
+            endButton.isHidden = true
             
         }else if isFullScreenMapOpen{
             
             //当地图处于大屏状态时调整其自动布局参数使其进入小屏
             for constraint in mapView.superview!.constraints{
                 
-                if constraint.firstItem as! NSObject == mapView && constraint.firstAttribute == .Height{
+                if constraint.firstItem as! NSObject == mapView && constraint.firstAttribute == .height{
                     
                     constraint.constant = 0
                 }
             }
             for constraint in mapView.superview!.constraints{
                 
-                if constraint.secondItem as? NSObject == pauseOrContinueButton && constraint.firstAttribute == .Top{
+                if constraint.secondItem as? NSObject == pauseOrContinueButton && constraint.firstAttribute == .top{
                     
                     constraint.constant += self.view.bounds.height/4
                 }
             }
             
-            startButton.hidden = false
-            pauseOrContinueButton.hidden = false
-            endButton.hidden = false
+            startButton.isHidden = false
+            pauseOrContinueButton.isHidden = false
+            endButton.isHidden = false
         }
         
-        UIView.animateWithDuration(0.3, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 10, options: .CurveEaseInOut, animations: {
+        UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 10, options: UIViewAnimationOptions(), animations: {
             self.view.layoutIfNeeded()
             }, completion: nil)
         
@@ -204,7 +204,7 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
         
     }
     
-    private lazy var locationManager: CLLocationManager = {
+    fileprivate lazy var locationManager: CLLocationManager = {
         let locationManager = CLLocationManager()
         
         locationManager.allowsBackgroundLocationUpdates = true
@@ -212,7 +212,7 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
         locationManager.pausesLocationUpdatesAutomatically = false
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        locationManager.activityType = .Fitness
+        locationManager.activityType = .fitness
         locationManager.distanceFilter = 10.0
         
         locationManager.requestAlwaysAuthorization()
@@ -226,7 +226,7 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
     @IBAction func startPressed() {
 
         mapView.showsUserLocation = true
-        mapView.userTrackingMode = .FollowWithHeading
+        mapView.userTrackingMode = .followWithHeading
 
         isInARunningLoop = true
         stepCounter.startStepCounting()
@@ -236,25 +236,25 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
         
         for constraint in startButton.superview!.constraints{
             
-            if constraint.secondItem as? NSObject == startButton && constraint.secondAttribute == .Trailing{
+            if constraint.secondItem as? NSObject == startButton && constraint.secondAttribute == .trailing{
                 
                 constraint.constant += view.bounds.width/2
             }
         }
-        UIView.animateWithDuration(0.5, delay: 0.1, usingSpringWithDamping: 0.8, initialSpringVelocity: 15, options: [], animations: {
+        UIView.animate(withDuration: 0.5, delay: 0.1, usingSpringWithDamping: 0.8, initialSpringVelocity: 15, options: [], animations: {
             self.view.layoutIfNeeded()
             }, completion: { _ in
-                self.discardButton.hidden = false
+                self.discardButton.isHidden = false
         })
         
         let logoRotator = CABasicAnimation(keyPath: "transform.rotation.z")
-        logoRotator.removedOnCompletion = false
+        logoRotator.isRemovedOnCompletion = false
         logoRotator.fillMode = kCAFillModeForwards
         logoRotator.duration = 0.5
         logoRotator.fromValue = 0.0
-        logoRotator.toValue = -2 * M_PI
+        logoRotator.toValue = -2 * Double.pi
         logoRotator.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
-        self.startButton.layer.addAnimation(logoRotator, forKey: "logoRotator")
+        self.startButton.layer.add(logoRotator, forKey: "logoRotator")
         
     }
     
@@ -267,12 +267,12 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
         if isRunning{
             stepCounter.pause()
             timeCounter.timingPause()
-            pauseOrContinueButton.setImage(UIImage(named: "tapToContinueIcon"), forState: .Normal)
+            pauseOrContinueButton.setImage(UIImage(named: "tapToContinueIcon"), for: UIControlState())
             isRunning = false
         }else if !isRunning{
             stepCounter.continueCounting()
             timeCounter.timingContinue()
-            pauseOrContinueButton.setImage(UIImage(named: "tapToPauseIcon"), forState: .Normal)
+            pauseOrContinueButton.setImage(UIImage(named: "tapToPauseIcon"), for: UIControlState())
             isRunning = true
         }
     }
@@ -288,24 +288,24 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
         isRunning = false
         stepCounter.endStepCounting()
         
-        let actionSheet = UIAlertController(title: "Running Complete", message: "Choose discard to restart or choose save to save this workout", preferredStyle: .ActionSheet)
-        actionSheet.addAction(UIAlertAction(title: "Save", style: .Default, handler: { _ in
+        let actionSheet = UIAlertController(title: "Running Complete", message: "Choose discard to restart or choose save to save this workout", preferredStyle: .actionSheet)
+        actionSheet.addAction(UIAlertAction(title: "Save", style: .default, handler: { _ in
             self.resertToStart()
-            self.performSegueWithIdentifier(saveWorkoutSegueIdentifier, sender: nil)
+            self.performSegue(withIdentifier: saveWorkoutSegueIdentifier, sender: nil)
         }))
-        actionSheet.addAction(UIAlertAction(title: "Discard", style: .Default, handler: {_ in
+        actionSheet.addAction(UIAlertAction(title: "Discard", style: .default, handler: {_ in
             self.resertToStart()
-            actionSheet.dismissViewControllerAnimated(true, completion: nil)
+            actionSheet.dismiss(animated: true, completion: nil)
         }))
-        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         
-        presentViewController(actionSheet, animated: true, completion: nil)
+        present(actionSheet, animated: true, completion: nil)
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
         if segue.identifier == saveWorkoutSegueIdentifier{
-            if let controller = segue.destinationViewController as? SaveAndShareViewController{
+            if let controller = segue.destination as? SaveAndShareViewController{
                 controller.workout = self.workout
             }
         }
@@ -321,7 +321,7 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
     
     func resertToStart() {
         isInARunningLoop = false
-        UIView.animateWithDuration(0.3, animations: { _ in
+        UIView.animate(withDuration: 0.3, animations: {
             self.discardButton.alpha = 0
         })
 
@@ -334,26 +334,26 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
         
         for constraint in startButton.superview!.constraints{
             
-            if constraint.secondItem as? NSObject == startButton && constraint.secondAttribute == .Trailing{
+            if constraint.secondItem as? NSObject == startButton && constraint.secondAttribute == .trailing{
                 
                 constraint.constant = 20
             }
         }
-        UIView.animateWithDuration(0.5, delay: 0.1, usingSpringWithDamping: 0.8, initialSpringVelocity: 15, options: [], animations: {
+        UIView.animate(withDuration: 0.5, delay: 0.1, usingSpringWithDamping: 0.8, initialSpringVelocity: 15, options: [], animations: {
             self.view.layoutIfNeeded()
             }, completion: { _ in
                 self.discardButton.alpha = 1.0
-                self.discardButton.hidden = true
+                self.discardButton.isHidden = true
         })
         
         let logoRotator = CABasicAnimation(keyPath: "transform.rotation.z")
-        logoRotator.removedOnCompletion = false
+        logoRotator.isRemovedOnCompletion = false
         logoRotator.fillMode = kCAFillModeForwards
         logoRotator.duration = 0.5
         logoRotator.fromValue = 0.0
-        logoRotator.toValue = 2 * M_PI
+        logoRotator.toValue = 2 * Double.pi
         logoRotator.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
-        self.startButton.layer.addAnimation(logoRotator, forKey: "logoRotator")
+        self.startButton.layer.add(logoRotator, forKey: "logoRotator")
 
     }
     
@@ -361,7 +361,7 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        discardButton.hidden = true
+        discardButton.isHidden = true
         //将四个主按钮设置成圆形按钮
         pauseOrContinueButton.layer.cornerRadius = pauseOrContinueButton.layer.bounds.width/2
         pauseOrContinueButton.clipsToBounds = true
@@ -386,79 +386,79 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
         //locationManager.startUpdatingHeading()
         
         //当前设备如果是iphone4s及以下设备时改变视图布局
-        if UIScreen.mainScreen().bounds.size.height == 480.0{
+        if UIScreen.main.bounds.size.height == 480.0{
             distanceAndTimeComplainLabel.removeFromSuperview()
         }
         
-        playMusicContainerView.hidden = true
+        playMusicContainerView.isHidden = true
         nowPlayingItemIsChanged()
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(NewRunViewController.stopMusic), name: UIApplicationWillTerminateNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(NewRunViewController.stopMusic), name: NSNotification.Name.UIApplicationWillTerminate, object: nil)
         
     }
     
     
 
     //使用viewWillAppear和viewdidAppear来进行动画
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
        //移动视图中元素所处位置，为动画作准备
         for constraint in pauseOrContinueButton.superview!.constraints{
-            if constraint.firstItem as? NSObject == pauseOrContinueButton && constraint.firstAttribute == .Leading{
+            if constraint.firstItem as? NSObject == pauseOrContinueButton && constraint.firstAttribute == .leading{
                 constraint.constant +=
                     self.view.bounds.size.width/2
             }
         }
         for constraint in endButton.superview!.constraints{
-            if constraint.firstItem as? NSObject == endButton && constraint.firstAttribute == .Leading{
+            if constraint.firstItem as? NSObject == endButton && constraint.firstAttribute == .leading{
                 constraint.constant += self.view.bounds.size.width/2
             }
         }
         for constraint in pauseOrContinueButton.superview!.constraints{
-            if constraint.secondItem as? NSObject == pauseOrContinueButton && constraint.secondAttribute == .Bottom{
+            if constraint.secondItem as? NSObject == pauseOrContinueButton && constraint.secondAttribute == .bottom{
                 constraint.constant -= self.view.bounds.size.height/2
             }
         }
         for constraint in mapView.superview!.constraints{
-            if constraint.firstItem as? NSObject == mapView && constraint.firstAttribute == .Height{
+            if constraint.firstItem as? NSObject == mapView && constraint.firstAttribute == .height{
                 constraint.constant -= view.bounds.size.height * constraint.multiplier
             }
         }
         
         //准备音乐播放按钮
-        if myMusicPlayer.playbackState == .Playing{
+        if myMusicPlayer.playbackState == .playing{
             musicIsPlaying = true
         }
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         //将视图元素的自动布局参数设回应有的数值
         for constraint in pauseOrContinueButton.superview!.constraints{
-            if constraint.firstItem as? NSObject == pauseOrContinueButton && constraint.firstAttribute == .Leading{
+            if constraint.firstItem as? NSObject == pauseOrContinueButton && constraint.firstAttribute == .leading{
                 constraint.constant -=
                     self.view.bounds.size.width/2
             }
         }
         for constraint in endButton.superview!.constraints{
-            if constraint.firstItem as? NSObject == endButton && constraint.firstAttribute == .Leading{
+            if constraint.firstItem as? NSObject == endButton && constraint.firstAttribute == .leading{
                 constraint.constant -= self.view.bounds.size.width/2
             }
         }
         for constraint in pauseOrContinueButton.superview!.constraints{
-            if constraint.secondItem as? NSObject == pauseOrContinueButton && constraint.secondAttribute == .Bottom{
+            if constraint.secondItem as? NSObject == pauseOrContinueButton && constraint.secondAttribute == .bottom{
                 constraint.constant += self.view.bounds.size.height/2
             }
         }
         for constraint in mapView.superview!.constraints{
-            if constraint.firstItem as? NSObject == mapView && constraint.firstAttribute == .Height{
+            if constraint.firstItem as? NSObject == mapView && constraint.firstAttribute == .height{
                 constraint.constant += view.bounds.size.height * constraint.multiplier
             }
         }
 
         //调用动画所需方法，开始动画
-        UIView.animateWithDuration(0.4, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 10, options: .CurveEaseOut, animations: {
+        UIView.animate(withDuration: 0.4, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 10, options: .curveEaseOut, animations: {
                 self.view.layoutIfNeeded()
             }, completion: nil)
     }
@@ -468,9 +468,9 @@ class NewRunViewController: UIViewController, StepCountingDelegate{
 
 extension NewRunViewController: CLLocationManagerDelegate{
     
-    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         
-        dispatch_async(dispatch_get_main_queue()) {
+        DispatchQueue.main.async {
             for location in locations{
                 
                 if location.horizontalAccuracy < 20{
@@ -478,7 +478,7 @@ extension NewRunViewController: CLLocationManagerDelegate{
                         self.distance = 0
                     }
                     if self.previousLocation != nil{
-                        self.distance += location.distanceFromLocation(self.previousLocation!)
+                        self.distance += location.distance(from: self.previousLocation!)
                         self.workout.distance = Int(self.distance)
                         //每更新一次距离更新一次跑步速度
                         if self.isRunning{
@@ -501,7 +501,7 @@ extension NewRunViewController: CLLocationManagerDelegate{
 
 extension NewRunViewController: MPMediaPickerControllerDelegate{
    
-    func stopMusic(){
+    @objc func stopMusic(){
         myMusicPlayer.stop()
         musicIsPlaying = false
     }
@@ -515,7 +515,7 @@ extension NewRunViewController: MPMediaPickerControllerDelegate{
         let mediaPicker = MPMediaPickerController()
         mediaPicker.delegate = self
         mediaPicker.allowsPickingMultipleItems = true
-        presentViewController(mediaPicker, animated: true, completion: nil)
+        present(mediaPicker, animated: true, completion: nil)
     }
     
     
@@ -535,27 +535,27 @@ extension NewRunViewController: MPMediaPickerControllerDelegate{
         
     }
     
-    func mediaPicker(mediaPicker: MPMediaPickerController, didPickMediaItems mediaItemCollection: MPMediaItemCollection) {
+    func mediaPicker(_ mediaPicker: MPMediaPickerController, didPickMediaItems mediaItemCollection: MPMediaItemCollection) {
         
         myMusicPlayer.beginGeneratingPlaybackNotifications()
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(NewRunViewController.nowPlayingItemIsChanged), name: MPMusicPlayerControllerNowPlayingItemDidChangeNotification, object: myMusicPlayer)
-        myMusicPlayer.setQueueWithItemCollection(mediaItemCollection)
-        myMusicPlayer.repeatMode = .All
+        NotificationCenter.default.addObserver(self, selector: #selector(NewRunViewController.nowPlayingItemIsChanged), name: NSNotification.Name.MPMusicPlayerControllerNowPlayingItemDidChange, object: myMusicPlayer)
+        myMusicPlayer.setQueue(with: mediaItemCollection)
+        myMusicPlayer.repeatMode = .all
         myMusicPlayer.skipToBeginning()
         myMusicPlayer.play()
         musicIsPlaying = true
-        mediaPicker.dismissViewControllerAnimated(true, completion: nil)
+        mediaPicker.dismiss(animated: true, completion: nil)
     }
     
-    func mediaPickerDidCancel(mediaPicker: MPMediaPickerController) {
-        mediaPicker.dismissViewControllerAnimated(true, completion: nil)
+    func mediaPickerDidCancel(_ mediaPicker: MPMediaPickerController) {
+        mediaPicker.dismiss(animated: true, completion: nil)
     }
 
-    func nowPlayingItemIsChanged(){
+    @objc func nowPlayingItemIsChanged(){
         
         if myMusicPlayer.nowPlayingItem != nil{
-            let albumImage = myMusicPlayer.nowPlayingItem?.artwork?.imageWithSize(CGSizeZero)
+            let albumImage = myMusicPlayer.nowPlayingItem?.artwork?.image(at: CGSize.zero)
             if albumImage != nil{
                 self.albumImageIcon.image = albumImage
             }else{
@@ -563,8 +563,16 @@ extension NewRunViewController: MPMediaPickerControllerDelegate{
                 self.albumImageIcon.image = image
             }
             
-            musicNameLabel.text = (myMusicPlayer.nowPlayingItem?.title)! + "-" + (myMusicPlayer.nowPlayingItem?.artist)!
-            musicDetailLabel.text = (myMusicPlayer.nowPlayingItem?.albumTitle)! + (myMusicPlayer.nowPlayingItem?.title)! + (myMusicPlayer.nowPlayingItem?.artist)! + (myMusicPlayer.nowPlayingItem!.genre)!
+            if let title = myMusicPlayer.nowPlayingItem?.title{
+                if let artist = myMusicPlayer.nowPlayingItem?.artist{
+                musicNameLabel.text = title + "-" + artist
+                    if let albumTitle = myMusicPlayer.nowPlayingItem?.albumTitle{
+                        if let genre =  myMusicPlayer.nowPlayingItem!.genre{
+                            musicDetailLabel.text = albumTitle + title + artist + genre
+                        }
+                    }
+                }
+            }
         }
     }
 }

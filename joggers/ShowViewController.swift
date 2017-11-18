@@ -23,15 +23,15 @@ class ShowViewController: UIViewController {
 
 
     @IBAction func reCapture() {
-        dismissViewControllerAnimated(true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
 
     @IBAction func OKPressed() {
-        dismissViewControllerAnimated(false, completion: nil)
-        let notification = NSNotification(name: PhotoCaptureNotification.photoChoosedNotificationName, object: self)
-        NSNotificationCenter.defaultCenter().postNotification(notification)
-        let photoInfoNotification = NSNotification(name: PhotoCaptureNotification.photoInfoNotificationName, object: self, userInfo: ["photo": image])
-        NSNotificationCenter.defaultCenter().postNotification(photoInfoNotification)
+        dismiss(animated: false, completion: nil)
+        let notification = Notification(name: Notification.Name(rawValue: PhotoCaptureNotification.photoChoosedNotificationName), object: self)
+        NotificationCenter.default.post(notification)
+        let photoInfoNotification = Notification(name: Notification.Name(rawValue: PhotoCaptureNotification.photoInfoNotificationName), object: self, userInfo: ["photo": image])
+        NotificationCenter.default.post(photoInfoNotification)
     }
 
 }

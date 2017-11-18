@@ -11,63 +11,63 @@ import UIKit
 class MenuTableViewController: UITableViewController {
 
     //用于配置Cell的图标和文字的属性
-    private var cellTitles = ["RUNNER", "New run", "History"]
-    private var cellFontNames = ["AvenirNextCondensed-italic", "Futura-Medium", "Futura-Medium"]
-    private var cellFontSize: [CGFloat] = [40, 22, 22]
-    private var imageNames = ["nil", "running_man", "running_history"]
-    private var highlightImageNames = ["nil", "running_man_highlight", "running_history_highlight"]
+    fileprivate var cellTitles = ["RUNNER", "New run", "History"]
+    fileprivate var cellFontNames = ["AvenirNextCondensed-italic", "Futura-Medium", "Futura-Medium"]
+    fileprivate var cellFontSize: [CGFloat] = [40, 22, 22]
+    fileprivate var imageNames = ["nil", "running_man", "running_history"]
+    fileprivate var highlightImageNames = ["nil", "running_man_highlight", "running_history_highlight"]
     //两个可选的table row的image icon
-    private var firstImageView: UIImageView!
-    private var seconImageView: UIImageView!
+    fileprivate var firstImageView: UIImageView!
+    fileprivate var seconImageView: UIImageView!
     
     //将status bar设置为LightContent因为这个视图是全黑的
-    override func preferredStatusBarStyle() -> UIStatusBarStyle {
-        return .LightContent
+    override var preferredStatusBarStyle : UIStatusBarStyle {
+        return .lightContent
     }
 
    
     
     //MARK; - UITabelViewDataSource
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
     
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 3
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = UITableViewCell()
         
         //配置Cell的图标和文字
-        if indexPath.row != 0{
+        if (indexPath as NSIndexPath).row != 0{
             
-            if indexPath.row == 1{
+            if (indexPath as NSIndexPath).row == 1{
                 firstImageView = UIImageView(frame: CGRect(origin: CGPoint(x: 0 , y: 0 + cell.layer.bounds.height/1.5 ), size: CGSize(width: cell.layer.bounds.height/2, height: cell.layer.bounds.height/2)))
-                firstImageView.image = UIImage(named: imageNames[indexPath.row])
+                firstImageView.image = UIImage(named: imageNames[(indexPath as NSIndexPath).row])
                 cell.addSubview(firstImageView)
-            }else if indexPath.row == 2{
+            }else if (indexPath as NSIndexPath).row == 2{
                 seconImageView = UIImageView(frame: CGRect(origin: CGPoint(x: 0 , y: 0 + cell.layer.bounds.height/1.5 ), size: CGSize(width: cell.layer.bounds.height/2, height: cell.layer.bounds.height/2)))
-                seconImageView.image = UIImage(named: imageNames[indexPath.row])
+                seconImageView.image = UIImage(named: imageNames[(indexPath as NSIndexPath).row])
                 cell.addSubview(seconImageView)
             }
             
             
             }
         
-        cell.textLabel?.text = cellTitles[indexPath.row]
-        if let font = UIFont(name: cellFontNames[indexPath.row], size: cellFontSize[indexPath.row]){
+        cell.textLabel?.text = cellTitles[(indexPath as NSIndexPath).row]
+        if let font = UIFont(name: cellFontNames[(indexPath as NSIndexPath).row], size: cellFontSize[(indexPath as NSIndexPath).row]){
             cell.textLabel?.font = font
-            cell.textLabel?.textColor = UIColor.lightGrayColor()
+            cell.textLabel?.textColor = UIColor.lightGray
         }
         
         //将Cell的背景色设置为透明，是其呈黑色
-        cell.backgroundColor = UIColor.clearColor()
+        cell.backgroundColor = UIColor.clear
         
         //自定义选中后row所显示的颜色，这里设置成了不显示
         let selectedBackgroundView = UIView(frame: cell.frame)
-        selectedBackgroundView.backgroundColor = UIColor.clearColor()
+        selectedBackgroundView.backgroundColor = UIColor.clear
         cell.selectedBackgroundView = selectedBackgroundView
         
         return cell
@@ -75,9 +75,9 @@ class MenuTableViewController: UITableViewController {
 
     //MARK: - UITableViewDelegate
     
-    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let cell = tableView.cellForRowAtIndexPath(indexPath)
+        let cell = tableView.cellForRow(at: indexPath)
         
         //创建一个褐色字体的Label覆盖原有Label，使得选中后row的字体颜色呈褐色
         let highlightedTextLabel = UILabel(frame: (cell?.textLabel?.bounds)!)
@@ -87,12 +87,12 @@ class MenuTableViewController: UITableViewController {
         cell?.textLabel?.addSubview(highlightedTextLabel)
         
         //创建一个褐色图标的imageView覆盖原有图标，使得选中后row中的图标呈现褐色
-        let highlightedIconImageView = UIImageView(frame: indexPath.row == 1 ? firstImageView.frame : seconImageView.frame)
-        highlightedIconImageView.image = UIImage(named: highlightImageNames[indexPath.row])
+        let highlightedIconImageView = UIImageView(frame: (indexPath as NSIndexPath).row == 1 ? firstImageView.frame : seconImageView.frame)
+        highlightedIconImageView.image = UIImage(named: highlightImageNames[(indexPath as NSIndexPath).row])
         cell?.addSubview(highlightedIconImageView)
         
         //在一秒后将覆盖在上面的图标移除
-        delay(seconds: 1) { _ in
+        delay(seconds: 1) {
             highlightedTextLabel.removeFromSuperview()
             highlightedIconImageView.removeFromSuperview()
             
@@ -100,18 +100,18 @@ class MenuTableViewController: UITableViewController {
     }
     
     
-    override func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
+    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         
-        if indexPath.row == 0{
+        if (indexPath as NSIndexPath).row == 0{
             
             return nil
-        }else if indexPath.row == 1{
+        }else if (indexPath as NSIndexPath).row == 1{
             
-            performSegueWithIdentifier("gotoNewRunView", sender: nil)
+            performSegue(withIdentifier: "gotoNewRunView", sender: nil)
             return indexPath
         }else{
             
-            performSegueWithIdentifier("gotoHistoryView", sender: nil)
+            performSegue(withIdentifier: "gotoHistoryView", sender: nil)
             return indexPath
         }
     }

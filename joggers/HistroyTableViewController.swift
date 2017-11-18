@@ -20,20 +20,20 @@ class HistroyTableViewController: UITableViewController {
 
     @IBOutlet weak var menuButton: UIBarButtonItem!
 
-    private var initiallyDisplayedCells = Int(UIScreen.mainScreen().bounds.size.height / CellHeight)
-    private var viewDidAppear = false
-    private var selectedIndexPath: NSIndexPath!
+    fileprivate var initiallyDisplayedCells = Int(UIScreen.main.bounds.size.height / CellHeight)
+    fileprivate var viewDidAppear = false
+    fileprivate var selectedIndexPath: IndexPath!
     
-    private var spinner:UIActivityIndicatorView!
+    fileprivate var spinner:UIActivityIndicatorView!
     
-    private var managedContext: NSManagedObjectContext!
+    fileprivate var managedContext: NSManagedObjectContext!
     
-    private var workouts = [Workout]()
-    private var dataFormatter = NSDateFormatter()
-    private lazy var iconImages = [UIImage]()
-    private lazy var runningTimes = [String]()
-    private lazy var distances = [Int]()
-    private lazy var dates = [String]()
+    fileprivate var workouts = [Workout]()
+    fileprivate var dataFormatter = DateFormatter()
+    fileprivate lazy var iconImages = [UIImage]()
+    fileprivate lazy var runningTimes = [String]()
+    fileprivate lazy var distances = [Int]()
+    fileprivate lazy var dates = [String]()
     
     
     // MARK: - ViewController lifecycle methods
@@ -43,13 +43,13 @@ class HistroyTableViewController: UITableViewController {
         //workouts = []
 
         spinner = UIActivityIndicatorView(frame: CGRect(origin: CGPoint(x: tableView.layer.bounds.width/2,y: 0), size: CGSize(width: 20, height: 20)))
-        spinner.color = UIColor.grayColor()
+        spinner.color = UIColor.gray
         tableView.addSubview(spinner)
         spinner.startAnimating()
       
-        dataFormatter.dateStyle = .MediumStyle
-        dataFormatter.calendar = NSCalendar.currentCalendar()
-        dataFormatter.timeStyle = .MediumStyle
+        dataFormatter.dateStyle = .medium
+        dataFormatter.calendar = Calendar.current
+        dataFormatter.timeStyle = .medium
        
         if revealViewController() != nil{
             menuButton.target = revealViewController()
@@ -61,10 +61,10 @@ class HistroyTableViewController: UITableViewController {
         
         tableView.separatorColor = UIColor(red: 203/255, green: 232/255, blue: 225/255, alpha: 0.7)
         
-        let appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         managedContext = appDelegate.managedObjectContext
         
-        dispatch_async(dispatch_get_global_queue(0, 0)) {
+        DispatchQueue.global().async {
             self.fetchWorkout()
             //获取到数据后对数据进行解析
             for workout in self.workouts{
@@ -76,16 +76,16 @@ class HistroyTableViewController: UITableViewController {
                     let image = UIImage(named: DefaultImageIconName)?.resizedImageWithBounds(CGSize(width: DefaultIconWidth, height: DefaultIconHeight))
                     self.iconImages.append(image!)
                 }
-                let time = getTimeStringFromSecond((workout.time?.integerValue)!)
+                let time = getTimeStringFromSecond((workout.time?.intValue)!)
                 self.runningTimes.append(time)
-                let distance = workout.distance!.integerValue
+                let distance = workout.distance!.intValue
                 self.distances.append(distance)
-                let dateString = self.dataFormatter.stringFromDate(workout.date!)
+                let dateString = self.dataFormatter.string(from: workout.date!)
                 self.dates.append(dateString)
                 
             }
             
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 self.tableView.reloadData()
                 self.spinner.removeFromSuperview()
             }
@@ -97,31 +97,31 @@ class HistroyTableViewController: UITableViewController {
     
     func fetchWorkout(){
         
-        let request = NSFetchRequest(entityName: "Workout")
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Workout")
         do{
-            workouts = try managedContext.executeFetchRequest(request) as! [Workout]
+            workouts = try managedContext.fetch(request) as! [Workout]
         }catch let error as NSError{
             print("Error in fetch: \(error.localizedDescription)")
         }
     }
 
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         viewDidAppear = true
         
     }
     
-    override func viewDidDisappear(animated: Bool) {
+    override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
         viewDidAppear = false
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == ShowDetailSegueIdentifier {
-            if let carouselViewController = segue.destinationViewController as? CarouselShowHistoryViewController{
+            if let carouselViewController = segue.destination as? CarouselShowHistoryViewController{
                 carouselViewController.dateFormatter = self.dataFormatter
                 var workoutsToPass = [Workout]()
                 if selectedIndexPath.row == 0 {
@@ -146,46 +146,46 @@ class HistroyTableViewController: UITableViewController {
     }
    
     // MARK: - Table view data source
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dates.count
     }
 
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCellWithIdentifier(CellIdentifier) as! HistoryTableViewCell
-        cell.runningTimeLabel.text = "Time: \(runningTimes[indexPath.row])"
-        cell.runningDistanceLabel.text = "RunningDistance: \(distances[indexPath.row])"
-        cell.dateLabel.text = dates[indexPath.row]
-        cell.iconImage = iconImages[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: CellIdentifier) as! HistoryTableViewCell
+        cell.runningTimeLabel.text = "Time: \(runningTimes[(indexPath as NSIndexPath).row])"
+        cell.runningDistanceLabel.text = "RunningDistance: \(distances[(indexPath as NSIndexPath).row])"
+        cell.dateLabel.text = dates[(indexPath as NSIndexPath).row]
+        cell.iconImage = iconImages[(indexPath as NSIndexPath).row]
         
         return cell
         
     }
     
     // MARK: - TabelView delegate
-    override func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         
-        if indexPath.row >= initiallyDisplayedCells || viewDidAppear {
+        if (indexPath as NSIndexPath).row >= initiallyDisplayedCells || viewDidAppear {
             return
         }else{
             cell.layer.frame.origin.y += view.bounds.width
-            UIView.animateWithDuration(1, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 15, options: [], animations: {
+            UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 15, options: [], animations: {
                 cell.layer.frame.origin.y -= self.view.bounds.width
                 }, completion: nil)
                 
         }
     }
     
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         
-        managedContext.deleteObject(workouts[indexPath.row])
-        workouts.removeAtIndex(indexPath.row)
-        iconImages.removeAtIndex(indexPath.row)
-        runningTimes.removeAtIndex(indexPath.row)
-        distances.removeAtIndex(indexPath.row)
-        dates.removeAtIndex(indexPath.row)
+        managedContext.delete(workouts[(indexPath as NSIndexPath).row])
+        workouts.remove(at: (indexPath as NSIndexPath).row)
+        iconImages.remove(at: (indexPath as NSIndexPath).row)
+        runningTimes.remove(at: (indexPath as NSIndexPath).row)
+        distances.remove(at: (indexPath as NSIndexPath).row)
+        dates.remove(at: (indexPath as NSIndexPath).row)
         
-        dispatch_async(dispatch_get_global_queue(0, 0)) {
+        DispatchQueue.global().async {
             do{
                 try self.managedContext.save()
             }catch let error as NSError{
@@ -193,10 +193,10 @@ class HistroyTableViewController: UITableViewController {
             }
 
         }
-        tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+        tableView.deleteRows(at: [indexPath], with: .automatic)
     }
     
-    override func tableView(tableView: UITableView, willSelectRowAtIndexPath indexPath: NSIndexPath) -> NSIndexPath? {
+    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         selectedIndexPath = indexPath
         return indexPath
     }

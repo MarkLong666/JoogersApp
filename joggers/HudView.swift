@@ -11,9 +11,9 @@ import UIKit
 class HudView: UIView {
     var text = ""
     
-    class func hudInView(view: UIView, animated: Bool) -> HudView {
+    class func hudInView(_ view: UIView, animated: Bool) -> HudView {
         let hudView = HudView(frame: view.bounds)
-        hudView.opaque = false
+        hudView.isOpaque = false
         
         view.addSubview(hudView)
         
@@ -21,7 +21,7 @@ class HudView: UIView {
         return hudView
     }
     
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
         let boxWidth: CGFloat = 150
         let boxHeight: CGFloat = 150
         
@@ -39,29 +39,29 @@ class HudView: UIView {
             let imagePoint = CGPoint(
                 x: center.x - round(30),
                 y: center.y - round(30) - boxHeight / 8)
-            image.drawInRect(CGRect(origin: imagePoint, size: CGSize(width: 60, height: 60)))
+            image.draw(in: CGRect(origin: imagePoint, size: CGSize(width: 60, height: 60)))
         }
         
-        let attribs = [ NSFontAttributeName: UIFont.boldSystemFontOfSize(20),
-                        NSForegroundColorAttributeName: MySpecialColors.specialRed ]
+        let attribs = [NSAttributedStringKey.font: UIFont.boldSystemFont(ofSize: 20),
+                        NSAttributedStringKey.foregroundColor: MySpecialColors.specialRed ]
         
-        let textSize = text.sizeWithAttributes(attribs)
+        let textSize = text.size(withAttributes: attribs)
         
         let textPoint = CGPoint(
             x: center.x - round(textSize.width / 2),
             y: center.y - round(textSize.height / 2) + boxHeight / 4)
         
-        text.drawAtPoint(textPoint, withAttributes: attribs)
+        text.draw(at: textPoint, withAttributes: attribs)
     }
     
-    func showAnimated(animated: Bool) {
+    func showAnimated(_ animated: Bool) {
         if animated {
             alpha = 0
-            transform = CGAffineTransformMakeScale(1.3, 1.3)
+            transform = CGAffineTransform(scaleX: 1.3, y: 1.3)
             
-            UIView.animateWithDuration(0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.5, options: [], animations: {
+            UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.7, initialSpringVelocity: 0.5, options: [], animations: {
                 self.alpha = 1
-                self.transform = CGAffineTransformIdentity
+                self.transform = CGAffineTransform.identity
                 },completion: nil)
         }
     }

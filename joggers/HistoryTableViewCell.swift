@@ -19,7 +19,7 @@ class HistoryTableViewCell: UITableViewCell {
         didSet{
             UIGraphicsBeginImageContextWithOptions(iconImageView.bounds.size, false, 2.0)
             UIBezierPath(roundedRect: iconImageView.bounds, cornerRadius: iconImageView.bounds.size.width/2).addClip()
-            iconImage.drawInRect(iconImageView.bounds)
+            iconImage.draw(in: iconImageView.bounds)
             iconImageView.image = UIGraphicsGetImageFromCurrentImageContext()
             UIGraphicsEndImageContext()
         }

@@ -16,21 +16,21 @@ class CaptureViewController: UIViewController {
     @IBOutlet weak var captureButton: UIButton!
     @IBOutlet weak var cancelButton: UIButton!
     
-    private lazy var captureSession = AVCaptureSession()
+    fileprivate lazy var captureSession = AVCaptureSession()
     
-    private var backFacingCamera: AVCaptureDevice?
-    private var frontFacingCamera: AVCaptureDevice?
-    private var currentDevice: AVCaptureDevice?
+    fileprivate var backFacingCamera: AVCaptureDevice?
+    fileprivate var frontFacingCamera: AVCaptureDevice?
+    fileprivate var currentDevice: AVCaptureDevice?
 
-    private var stillImageOutput: AVCaptureStillImageOutput?
-    private var stillImage: UIImage?
+    fileprivate var stillImageOutput: AVCaptureStillImageOutput?
+    fileprivate var stillImage: UIImage?
 
-    private var cameraPreviewLayer: AVCaptureVideoPreviewLayer?
+    fileprivate var cameraPreviewLayer: AVCaptureVideoPreviewLayer?
     
     //And Gestures
-    private lazy var toggleCameraGestureRecognizer = UISwipeGestureRecognizer()
-    private lazy var zoomInGestureRecognizer = UISwipeGestureRecognizer()
-    private lazy var zoomOutGestureRecognizer = UISwipeGestureRecognizer()
+    fileprivate lazy var toggleCameraGestureRecognizer = UISwipeGestureRecognizer()
+    fileprivate lazy var zoomInGestureRecognizer = UISwipeGestureRecognizer()
+    fileprivate lazy var zoomOutGestureRecognizer = UISwipeGestureRecognizer()
   
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,16 +38,16 @@ class CaptureViewController: UIViewController {
         //设置拍照按钮为圆形
         captureButton.layer.cornerRadius = captureButton.layer.bounds.width/2
         //在收到选择好照片的通知后关闭视图
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(dismissViewConroller), name: PhotoCaptureNotification.photoChoosedNotificationName, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(dismissViewConroller), name: NSNotification.Name(rawValue: PhotoCaptureNotification.photoChoosedNotificationName), object: nil)
         
-        captureSession.sessionPreset = AVCaptureSessionPresetPhoto
+        captureSession.sessionPreset = AVCaptureSession.Preset.photo
         
-        let devices = AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo) as! [AVCaptureDevice]
+        let devices = AVCaptureDevice.devices(for: AVMediaType.video)
         //获取前置和后置摄像头用于拍照
         for device in devices{
-            if device.position == .Front{
+            if device.position == .front{
                 frontFacingCamera = device
-            }else if device.position == .Back{
+            }else if device.position == .back{
                 backFacingCamera = device
             }
         }
@@ -60,10 +60,10 @@ class CaptureViewController: UIViewController {
         
         //从摄像头获取数据输入
         do{
-            let captureDeviceInput = try AVCaptureDeviceInput(device: currentDevice)
+            let captureDeviceInput = try AVCaptureDeviceInput(device: currentDevice!)
             
             captureSession.addInput(captureDeviceInput)
-            captureSession.addOutput(stillImageOutput)
+            captureSession.addOutput(stillImageOutput!)
             
         }catch let error as NSError{
             print(error.localizedDescription)
@@ -72,27 +72,27 @@ class CaptureViewController: UIViewController {
         //提供一个摄像头预览
         cameraPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
         view.layer.addSublayer(cameraPreviewLayer!)
-        cameraPreviewLayer?.videoGravity =  AVLayerVideoGravityResizeAspectFill
+        cameraPreviewLayer?.videoGravity =  AVLayerVideoGravity.resizeAspectFill
         cameraPreviewLayer?.frame = view.layer.frame
         
         //把被预览图层掩盖的按钮放置到前面
-        view.bringSubviewToFront(cancelButton)
-        view.bringSubviewToFront(captureButton)
+        view.bringSubview(toFront: cancelButton)
+        view.bringSubview(toFront: captureButton)
         
         captureSession.startRunning()
         
         //Toggle camera recognizer
-        toggleCameraGestureRecognizer.direction = .Up
+        toggleCameraGestureRecognizer.direction = .up
         toggleCameraGestureRecognizer.addTarget(self, action: #selector(self.toggleCamera))
         view.addGestureRecognizer(toggleCameraGestureRecognizer)
         
         //Zoom in recognizer
-        zoomInGestureRecognizer.direction = .Right
+        zoomInGestureRecognizer.direction = .right
         zoomInGestureRecognizer.addTarget(self, action: #selector(self.zoomIn))
         view.addGestureRecognizer(zoomInGestureRecognizer)
         
         //Zoom out recogizer
-        zoomOutGestureRecognizer.direction = .Left
+        zoomOutGestureRecognizer.direction = .left
         zoomOutGestureRecognizer.addTarget(self, action: #selector(self.zoomOut))
         view.addGestureRecognizer(zoomOutGestureRecognizer)
 
@@ -100,22 +100,22 @@ class CaptureViewController: UIViewController {
     }
 
     
-    func toggleCamera(){
+    @objc func toggleCamera(){
         
         captureSession.beginConfiguration()
         
         //Change the device base the current camera
-        let newDevice = (currentDevice?.position == AVCaptureDevicePosition.Back) ? frontFacingCamera : backFacingCamera
+        let newDevice = (currentDevice?.position == AVCaptureDevice.Position.back) ? frontFacingCamera : backFacingCamera
         
         //Remove all inputs from the session
         for input in captureSession.inputs{
-            captureSession.removeInput(input as! AVCaptureInput)
+            captureSession.removeInput(input )
         }
         
         //Change to the new input
         let cameraInput:AVCaptureDeviceInput
         do{
-            cameraInput = try AVCaptureDeviceInput(device: newDevice)
+            cameraInput = try AVCaptureDeviceInput(device: newDevice!)
             
         }catch let error as NSError{
             print(error)
@@ -130,14 +130,14 @@ class CaptureViewController: UIViewController {
         captureSession.commitConfiguration()
     }
     
-    func zoomIn(){
+    @objc func zoomIn(){
         if let zoomFactor = currentDevice?.videoZoomFactor{
             if zoomFactor < 5.0 {
                 let newZoomFactor = min(zoomFactor + 1.0, 5.0)
                 
                 do{
                     try currentDevice?.lockForConfiguration()
-                    currentDevice?.rampToVideoZoomFactor(newZoomFactor, withRate: 1.0)
+                    currentDevice?.ramp(toVideoZoomFactor: newZoomFactor, withRate: 1.0)
                     currentDevice?.unlockForConfiguration()
                 }catch let error as NSError{
                     print(error.localizedDescription)
@@ -148,13 +148,13 @@ class CaptureViewController: UIViewController {
         }
     }
     
-    func zoomOut(){
+    @objc func zoomOut(){
         if let zoomFactor = currentDevice?.videoZoomFactor{
             if zoomFactor > 1.0{
                 let newZoomFactor = max(zoomFactor - 1.0, 1.0)
                 do{
                     try currentDevice?.lockForConfiguration()
-                    currentDevice?.rampToVideoZoomFactor(newZoomFactor, withRate: 1.0)
+                    currentDevice?.ramp(toVideoZoomFactor: newZoomFactor, withRate: 1.0)
                     currentDevice?.unlockForConfiguration()
                 }catch let error as NSError{
                     print(error.localizedDescription)
@@ -165,30 +165,30 @@ class CaptureViewController: UIViewController {
 
     
     @IBAction func capturePressed() {
-        let videoConnection = stillImageOutput?.connectionWithMediaType(AVMediaTypeVideo)
+        let videoConnection = stillImageOutput?.connection(with: AVMediaType.video)
         
-        stillImageOutput?.captureStillImageAsynchronouslyFromConnection(videoConnection, completionHandler: { (imageDataSampleBuffer, error) -> Void in
+        stillImageOutput?.captureStillImageAsynchronously(from: videoConnection!, completionHandler: { (imageDataSampleBuffer, error) -> Void in
             
-            let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer)
-            self.stillImage = UIImage(data: imageData)
-            self.performSegueWithIdentifier(ShowPhotoSegueIdentifier, sender: self)
+            let imageData = AVCaptureStillImageOutput.jpegStillImageNSDataRepresentation(imageDataSampleBuffer!)
+            self.stillImage = UIImage(data: imageData!)
+            self.performSegue(withIdentifier: ShowPhotoSegueIdentifier, sender: self)
         })
 
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == ShowPhotoSegueIdentifier {
-            let showViewController = segue.destinationViewController as! ShowViewController
+            let showViewController = segue.destination as! ShowViewController
             showViewController.image = stillImage
         }
     }
     
     @IBAction func CancelPressed() {
-        dismissViewControllerAnimated(true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
-    func dismissViewConroller(){
-        dismissViewControllerAnimated(false, completion: nil)
+    @objc func dismissViewConroller(){
+        dismiss(animated: false, completion: nil)
     }
    
 }

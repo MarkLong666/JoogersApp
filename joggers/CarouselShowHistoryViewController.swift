@@ -16,27 +16,27 @@ private let CollectionCellIMageViewHeight = 320
 
 class CarouselShowHistoryViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource{
     
-    private var pace = [Int]()
-    private var steps = [Int]()
-    private var image = [UIImage]()
-    private var time = [String]()
-    private var distance = [Int]()
-    private var dateString = [String]()
-    var dateFormatter: NSDateFormatter!
+    fileprivate var pace = [Int]()
+    fileprivate var steps = [Int]()
+    fileprivate var image = [UIImage]()
+    fileprivate var time = [String]()
+    fileprivate var distance = [Int]()
+    fileprivate var dateString = [String]()
+    var dateFormatter: DateFormatter!
     var workouts: [Workout]!{
         didSet{
             for workout in workouts{
             if let photoData = workout.photo{
-                let workoutImage = UIImage(data: photoData)
+                let workoutImage = UIImage(data: photoData as Data)
                 image.append((workoutImage?.resizedImageWithBounds(CGSize(width: CollectionCellImageViewWidth*2, height: CollectionCellIMageViewHeight*2)))!)
             }else{
                 image.append(UIImage(named: DefaultImageName)!)
             }
-            time.append(getTimeStringFromSecond(workout.time!.integerValue))
-            distance.append( workout.distance!.integerValue)
-            dateString.append(dateFormatter.stringFromDate(workout.date!))
-            steps.append(workout.steps!.integerValue)
-            pace.append(workout.pace!.integerValue)
+            time.append(getTimeStringFromSecond(workout.time!.intValue))
+            distance.append( workout.distance!.intValue)
+            dateString.append(dateFormatter.string(from: workout.date! as Date))
+            steps.append(workout.steps!.intValue)
+            pace.append(workout.pace!.intValue)
             }
         }
     }
@@ -46,44 +46,44 @@ class CarouselShowHistoryViewController: UIViewController, UICollectionViewDeleg
     
         
     @IBAction func goBackPressed() {
-        dismissViewControllerAnimated(true, completion: nil)
+        dismiss(animated: true, completion: nil)
     }
     
     // MARK: - View controller lifecycle method
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        collectionView.backgroundColor = UIColor.clearColor()
+        collectionView.backgroundColor = UIColor.clear
 
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if workouts.count == 3 {
-        collectionView.scrollToItemAtIndexPath(NSIndexPath.init(forRow: 1, inSection: 0), atScrollPosition: UICollectionViewScrollPosition.CenteredHorizontally, animated: true)
+        collectionView.scrollToItem(at: IndexPath.init(row: 1, section: 0), at: UICollectionViewScrollPosition.centeredHorizontally, animated: true)
         }
     }
    
     //将statusbar字体改为白色以美化桌面
-    override func preferredStatusBarStyle() -> UIStatusBarStyle {
-        return .LightContent
+    override var preferredStatusBarStyle : UIStatusBarStyle {
+        return .lightContent
     }
     
     
     //MARK: UICollectionView dataSource
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return workouts.count
     }
     
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(CollectionViewCellReuseIdentifier, forIndexPath: indexPath) as! HistoryCollectionCell
-        cell.imageView.image = image[indexPath.row]
-        cell.distanceLabel.text = "\(distance[indexPath.row])M"
-        cell.dateLabel.text = dateString[indexPath.row]
-        cell.timeLabel.text = "Time: \(time[indexPath.row])"
-        cell.stepsLabel.text = "Steps: \(steps[indexPath.row])"
-        cell.paceLabel.text = "Pace: \(pace[indexPath.row])"
-        cell.backgroundColor = UIColor.whiteColor()
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionViewCellReuseIdentifier, for: indexPath) as! HistoryCollectionCell
+        cell.imageView.image = image[(indexPath as NSIndexPath).row]
+        cell.distanceLabel.text = "\(distance[(indexPath as NSIndexPath).row])M"
+        cell.dateLabel.text = dateString[(indexPath as NSIndexPath).row]
+        cell.timeLabel.text = "Time: \(time[(indexPath as NSIndexPath).row])"
+        cell.stepsLabel.text = "Steps: \(steps[(indexPath as NSIndexPath).row])"
+        cell.paceLabel.text = "Pace: \(pace[(indexPath as NSIndexPath).row])"
+        cell.backgroundColor = UIColor.white
         return cell
     }
     

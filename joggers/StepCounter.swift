@@ -10,23 +10,23 @@ import Foundation
 import CoreMotion
 
 protocol StepCountingDelegate {
-    func didUpdateSteps(numberOfSteps: Int)
+    func didUpdateSteps(_ numberOfSteps: Int)
 }
 
 class StepCounter: NSObject {
     
-    private var startTime: NSDate?
-    private var endTime: NSDate!
-    private var pedonmter: CMPedometer!
-    lazy private var numberOfSteps = 0
-    private var getSetpTimer:NSTimer?
+    fileprivate var startTime: Date?
+    fileprivate var endTime: Date!
+    fileprivate var pedonmter: CMPedometer!
+    lazy fileprivate var numberOfSteps = 0
+    fileprivate var getSetpTimer:Timer?
     var delegate: StepCountingDelegate!
-    private var shouldUpdateSteps = false
+    fileprivate var shouldUpdateSteps = false
     
     
     func startStepCounting() {
         numberOfSteps = 0
-        startTime = NSDate()
+        startTime = Date()
         shouldUpdateSteps = true
         startUpdateSteps()
     }
@@ -50,11 +50,11 @@ class StepCounter: NSObject {
         getSetpTimer?.invalidate()
         startTime = nil
     }
-    private func startUpdateSteps(){
-        getSetpTimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: #selector(StepCounter.getNumberOfSteps), userInfo: nil, repeats: true)
+    fileprivate func startUpdateSteps(){
+        getSetpTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(StepCounter.getNumberOfSteps), userInfo: nil, repeats: true)
     }
     
-    @objc private func getNumberOfSteps(){
+    @objc fileprivate func getNumberOfSteps(){
         
         getPedonmeterData()
         
@@ -63,18 +63,18 @@ class StepCounter: NSObject {
         }
     }
     
-    private func getPedonmeterData(){
+    fileprivate func getPedonmeterData(){
         
-        endTime = NSDate()
+        endTime = Date()
         pedonmter = CMPedometer()
         if CMPedometer.isStepCountingAvailable(){
             if startTime != nil{
-            pedonmter.queryPedometerDataFromDate(startTime!, toDate: endTime, withHandler: { (data, error) in
+            pedonmter.queryPedometerData(from: startTime!, to: endTime, withHandler: { (data, error) in
                 if error != nil{
-                    print("\(error?.localizedDescription)")
+                    print(error!.localizedDescription)
                 }else{
                     if data != nil{
-                        dispatch_async(dispatch_get_main_queue(), {
+                        DispatchQueue.main.async(execute: {
                             self.numberOfSteps = Int(data!.numberOfSteps)
                         })
                     }
